@@ -1,0 +1,7 @@
+{
+  "name": "dotenv-c",
+  "version": "1.0.0",
+  "description": "This small package adds support for loading .env files.",
+  "homepage": "https://github.com/Isty001/dotenv-c"
+}
+
