@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #if (defined(_WIN32) || defined(_MSC_VER)) && !defined(__MINGW32__)
 
@@ -194,6 +195,7 @@ int env_load(const char *path, bool overwrite)
 char * env_get_from_file(const char *path, const char *name)
 {
     FILE *file = open_default(path);
+    char *ret_value = NULL;
 
     if (!file) {
         file = fopen(path, "rb");
@@ -209,15 +211,18 @@ char * env_get_from_file(const char *path, const char *name)
     while (-1 != getline(&line, &len, file)) {
         if (!is_commented(line)) {
             char *env_name = strtok_r(line, "=", &tok_ptr);
-            char *env_value = strtok_r(NULL, "\n", &tok_ptr);
+            char *value = strtok_r(NULL, "\n", &tok_ptr);
 
             if (strcmp(env_name, name) == 0) {
-                fclose(file);
-                return env_value;
+                value = remove_space(parse_value(value));
+                ret_value = malloc(strlen(value));
+                strcpy(ret_value, value);
+                break;
             }
         }
     }
 
+    free(line);
     fclose(file);
-    return NULL;
+    return ret_value;
 }
