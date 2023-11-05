@@ -10,11 +10,13 @@
 #include <string.h>
 #define strtok_r strtok_s
 
-int setenv(const char *name, const char *value, int overwrite) {
+int setenv(const char *name, const char *value, int overwrite)
+{
     int errcode = 0;
-    if (!overwrite) {
+    if (!overwrite)
+    {
         size_t envsize = 0;
-        errcode        = getenv_s(&envsize, NULL, 0, name);
+        errcode = getenv_s(&envsize, NULL, 0, name);
         if (errcode || envsize)
             return errcode;
     }
@@ -22,12 +24,14 @@ int setenv(const char *name, const char *value, int overwrite) {
 }
 
 // https://dev.w3.org/libwww/Library/src/vms/getline.c
-int getline(char **lineptr, size_t *n, FILE *stream) {
-    static char  line[256];
-    char        *ptr;
+int getline(char **lineptr, size_t *n, FILE *stream)
+{
+    static char line[256];
+    char *ptr;
     unsigned int len;
 
-    if (lineptr == NULL || n == NULL) {
+    if (lineptr == NULL || n == NULL)
+    {
         errno = EINVAL;
         return -1;
     }
@@ -46,12 +50,13 @@ int getline(char **lineptr, size_t *n, FILE *stream) {
 
     len = strlen(line);
 
-    if ((len + 1) < 256) {
+    if ((len + 1) < 256)
+    {
         ptr = realloc(*lineptr, 256);
         if (ptr == NULL)
             return (-1);
         *lineptr = ptr;
-        *n       = 256;
+        *n = 256;
     }
 
     strcpy(*lineptr, line);
@@ -65,13 +70,14 @@ int getline(char **lineptr, size_t *n, FILE *stream) {
 
 #define remove_space(value) value + 1
 
-
 static char *concat(char *buffer, char *string)
 {
-    if (!buffer) {
+    if (!buffer)
+    {
         return strdup(string);
     }
-    if (string) {
+    if (string)
+    {
         size_t length = strlen(buffer) + strlen(string) + 1;
         char *new = realloc(buffer, length);
 
@@ -105,12 +111,15 @@ static char *parse_value(char *value)
     char *search = value, *parsed = NULL, *tok_ptr;
     char *name;
 
-    if (value && is_nested(value)) {
-        while (1) {
+    if (value && is_nested(value))
+    {
+        while (1)
+        {
             parsed = concat(parsed, strtok_r(search, "${", &tok_ptr));
             name = strtok_r(NULL, "}", &tok_ptr);
 
-            if (!name) {
+            if (!name)
+            {
                 break;
             }
             parsed = concat(parsed, getenv(remove_bracket(name)));
@@ -125,13 +134,16 @@ static char *parse_value(char *value)
 
 static bool is_commented(char *line)
 {
-    if ('#' == line[0]) {
+    if ('#' == line[0])
+    {
         return true;
     }
 
     int i = 0;
-    while (' ' == line[i]) {
-        if ('#' == line[++i]) {
+    while (' ' == line[i])
+    {
+        if ('#' == line[++i])
+        {
             return true;
         }
     }
@@ -143,7 +155,8 @@ static void set_variable(char *name, char *original, bool overwrite)
 {
     char *parsed;
 
-    if (original) {
+    if (original)
+    {
         parsed = parse_value(original);
         setenv(name, remove_space(parsed), overwrite);
 
@@ -156,8 +169,10 @@ static void parse(FILE *file, bool overwrite)
     char *name, *original, *line = NULL, *tok_ptr;
     size_t len = 0;
 
-    while (-1 != getline(&line, &len, file)) {
-        if (!is_commented(line)) {
+    while (-1 != getline(&line, &len, file))
+    {
+        if (!is_commented(line))
+        {
             name = strtok_r(line, "=", &tok_ptr);
             original = strtok_r(NULL, "\n", &tok_ptr);
 
@@ -179,10 +194,12 @@ int env_load(const char *path, bool overwrite)
 {
     FILE *file = open_default(path);
 
-    if (!file) {
+    if (!file)
+    {
         file = fopen(path, "rb");
 
-        if (!file) {
+        if (!file)
+        {
             return -1;
         }
     }
@@ -192,15 +209,17 @@ int env_load(const char *path, bool overwrite)
     return 0;
 }
 
-char * env_get_from_file(const char *path, const char *name)
+char *env_get_from_file(const char *path, const char *name, const char *default_value)
 {
     FILE *file = open_default(path);
     char *ret_value = NULL;
 
-    if (!file) {
+    if (!file)
+    {
         file = fopen(path, "rb");
 
-        if (!file) {
+        if (!file)
+        {
             return NULL;
         }
     }
@@ -208,12 +227,15 @@ char * env_get_from_file(const char *path, const char *name)
     char *line = NULL, *tok_ptr;
     size_t len = 0;
 
-    while (-1 != getline(&line, &len, file)) {
-        if (!is_commented(line)) {
+    while (-1 != getline(&line, &len, file))
+    {
+        if (!is_commented(line))
+        {
             char *env_name = strtok_r(line, "=", &tok_ptr);
             char *value = strtok_r(NULL, "\n", &tok_ptr);
 
-            if (strcmp(env_name, name) == 0) {
+            if (strcmp(env_name, name) == 0)
+            {
                 value = remove_space(parse_value(value));
                 ret_value = malloc(strlen(value));
                 strcpy(ret_value, value);
@@ -224,5 +246,12 @@ char * env_get_from_file(const char *path, const char *name)
 
     free(line);
     fclose(file);
+
+    if ((ret_value == NULL) && (default_value != NULL))
+    {
+        ret_value = malloc(strlen(default_value));
+        strcpy(ret_value, default_value);
+    }
+
     return ret_value;
 }

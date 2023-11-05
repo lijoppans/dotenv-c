@@ -18,9 +18,10 @@ int env_load(const char* path, bool overwrite);
 /**
  * @param path Can be a directory containing a file named .env, or the path of the env file itself
  * @param name The name of the variable to get
+ * @param default_value The value to return if the variable is not found
  * @return NULL if the variable is not found, or the value of the variable
  */
-char * env_get_from_file(const char *path, const char *name);
+char * env_get_from_file(const char *path, const char *name, const char *default_value);
 
 #ifdef __cplusplus
 }

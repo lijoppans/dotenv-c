@@ -59,7 +59,8 @@ int main(void)
     test_comment();
     test_overwrite();
 
-    assert(0 == strcmp("unit test", env_get_from_file("./test", "VALUE")));
+    assert(0 == strcmp("unit test", env_get_from_file("./test", "VALUE", NULL)));
+    assert(0 == strcmp("default value", env_get_from_file("./test", "VALUE_NOT_EXISTSS", "default value")));
 
     puts("All tests are fine!");
 
