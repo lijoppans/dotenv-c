@@ -191,3 +191,33 @@ int env_load(const char *path, bool overwrite)
     return 0;
 }
 
+char *env_get_from_file(const char *path, const char *name)
+{
+    FILE *file = open_default(path);
+
+    if (!file) {
+        file = fopen(path, "rb");
+
+        if (!file) {
+            return NULL;
+        }
+    }
+
+    char *line = NULL, *tok_ptr;
+    size_t len = 0;
+
+    while (-1 != getline(&line, &len, file)) {
+        if (!is_commented(line)) {
+            char *env_name = strtok_r(line, "=", &tok_ptr);
+            char *env_value = strtok_r(NULL, "\n", &tok_ptr);
+
+            if (strcmp(env_name, name) == 0) {
+                fclose(file);
+                return env_value;
+            }
+        }
+    }
+    fclose(file);
+    return NULL;
+}
+
