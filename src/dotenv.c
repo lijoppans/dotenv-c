@@ -191,7 +191,7 @@ int env_load(const char *path, bool overwrite)
     return 0;
 }
 
-char *env_get_from_file(const char *path, const char *name)
+char * env_get_from_file(const char *path, const char *name)
 {
     FILE *file = open_default(path);
 
@@ -217,7 +217,7 @@ char *env_get_from_file(const char *path, const char *name)
             }
         }
     }
+
     fclose(file);
     return NULL;
 }
-

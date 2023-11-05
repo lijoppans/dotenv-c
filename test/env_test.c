@@ -2,6 +2,7 @@
 #include <dotenv.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <string.h>
 #include "assert.h"
 
 #if defined(_WIN32)
@@ -57,6 +58,8 @@ int main(void)
     test_value();
     test_comment();
     test_overwrite();
+
+    assert(0 == strcmp("unit test", env_get_from_file("./test", "VALUE")));
 
     puts("All tests are fine!");
 

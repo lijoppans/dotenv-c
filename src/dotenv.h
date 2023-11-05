@@ -20,7 +20,7 @@ int env_load(const char* path, bool overwrite);
  * @param name The name of the variable to get
  * @return NULL if the variable is not found, or the value of the variable
  */
-char *env_get_from_file(const char *path, const char *name);
+char * env_get_from_file(const char *path, const char *name);
 
 #ifdef __cplusplus
 }

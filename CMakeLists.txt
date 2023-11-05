@@ -86,7 +86,7 @@ if (DOTENV_PACKAGE)
     install(TARGETS ${DOTENV_C_PACKAGE} EXPORT "${DOTENV_C_PACKAGE}-targets")
     install(FILES src/dotenv.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
     install(EXPORT "${DOTENV_C_PACKAGE}-targets"
-	NAMESPACE dotenv::
+	NAMESPACE dotenv-c::
 	DESTINATION ${CMAKE_INSTALL_DATADIR}/dotenv-c)
 endif()
 
